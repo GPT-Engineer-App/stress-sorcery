@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Menu, Paw, Heart, Info, Facebook, Twitter, Instagram } from "lucide-react";
-import { motion } from "framer-motion";
+import { Menu, Paw, Heart, Info, Facebook, Twitter, Instagram, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -63,7 +64,7 @@ const Index = () => {
         )}
       </nav>
 
-      <div className="relative bg-cover bg-center h-screen flex items-center justify-center" style={{backgroundImage: "url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"}}>
+      <div className="relative bg-cover bg-center h-screen flex items-center justify-center overflow-hidden" style={{backgroundImage: "url('https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')"}}>
         <div className="absolute inset-0 bg-black bg-opacity-50" style={{ transform: `translateY(${scrollY * 0.5}px)` }}></div>
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -71,8 +72,39 @@ const Index = () => {
           transition={{ duration: 1 }}
           className="relative z-10 text-center"
         >
-          <h1 className="text-6xl font-bold text-white mb-4">All About Cats</h1>
-          <p className="text-xl text-white">Discover the fascinating world of felines</p>
+          <motion.h1 
+            className="text-7xl font-bold text-white mb-4"
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            All About Cats
+          </motion.h1>
+          <motion.p 
+            className="text-2xl text-white"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8 }}
+          >
+            Discover the fascinating world of felines
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <Button variant="outline" size="lg" className="mt-8 bg-white text-black hover:bg-gray-200">
+              Explore Now
+            </Button>
+          </motion.div>
+        </motion.div>
+        <motion.div 
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.5, duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
+        >
+          <ChevronDown className="w-10 h-10 text-white" />
         </motion.div>
       </div>
       
@@ -137,43 +169,50 @@ const Index = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Cat Breed Showcase</h2>
-          <div className="flex overflow-x-auto space-x-4 pb-4">
-            {["Siamese", "Persian", "Maine Coon", "Bengal", "Scottish Fold"].map((breed, index) => (
-              <Card key={index} className="flex-shrink-0 w-64 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <img src={`https://placekitten.com/300/200?image=${index + 1}`} alt={breed} className="w-full h-40 object-cover" />
-                <CardHeader>
-                  <CardTitle>{breed}</CardTitle>
-                </CardHeader>
-              </Card>
-            ))}
-          </div>
+          <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Cat Breed Showcase</h2>
+          <Carousel className="w-full max-w-4xl mx-auto">
+            <CarouselContent>
+              {["Siamese", "Persian", "Maine Coon", "Bengal", "Scottish Fold"].map((breed, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-1">
+                    <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                      <img src={`https://placekitten.com/300/200?image=${index + 1}`} alt={breed} className="w-full h-48 object-cover rounded-t-lg" />
+                      <CardHeader>
+                        <CardTitle className="text-center">{breed}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-center text-gray-600">Click to learn more about {breed} cats</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
         </motion.div>
 
-        <Card className="mt-12 bg-white shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <Card className="mt-16 bg-white shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
-            <CardTitle className="flex items-center"><Info className="mr-2 text-blue-500" /> Interesting Cat Facts</CardTitle>
+            <CardTitle className="flex items-center text-2xl"><Info className="mr-2 text-blue-500" /> Fascinating Cat Facts</CardTitle>
           </CardHeader>
           <CardContent>
-            <Accordion type="single" collapsible>
-              <AccordionItem value="item-1">
-                <AccordionTrigger>How long do cats sleep?</AccordionTrigger>
-                <AccordionContent>
-                  Cats sleep an average of 15 hours a day, and some can sleep up to 20 hours in a 24-hour period.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2">
-                <AccordionTrigger>How fast can a cat run?</AccordionTrigger>
-                <AccordionContent>
-                  The average house cat can run at a top speed of about 30 mph over short distances.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3">
-                <AccordionTrigger>Do cats sweat?</AccordionTrigger>
-                <AccordionContent>
-                  Cats only sweat through their paw pads. They primarily cool themselves by panting.
-                </AccordionContent>
-              </AccordionItem>
+            <Accordion type="single" collapsible className="w-full">
+              {[
+                { question: "How long do cats sleep?", answer: "Cats sleep an average of 15 hours a day, and some can sleep up to 20 hours in a 24-hour period." },
+                { question: "How fast can a cat run?", answer: "The average house cat can run at a top speed of about 30 mph over short distances." },
+                { question: "Do cats sweat?", answer: "Cats only sweat through their paw pads. They primarily cool themselves by panting." },
+                { question: "How many teeth do cats have?", answer: "Adult cats have 30 teeth, while kittens have 26 temporary teeth." },
+                { question: "Can cats see in complete darkness?", answer: "Cats can't see in complete darkness, but they can see in light six times dimmer than what humans need to see." }
+              ].map((item, index) => (
+                <AccordionItem value={`item-${index + 1}`} key={index}>
+                  <AccordionTrigger className="text-lg font-semibold">{item.question}</AccordionTrigger>
+                  <AccordionContent className="text-gray-700">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </CardContent>
         </Card>
