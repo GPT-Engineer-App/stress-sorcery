@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Menu, Paw, Heart, Info, Facebook, Twitter, Instagram, ChevronDown } from "lucide-react";
+import { Menu, Paw, Heart, Info, Facebook, Twitter, Instagram, ChevronDown, Star, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { useInView } from "react-intersection-observer";
 
 const Index = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -28,9 +29,14 @@ const Index = () => {
     setCatFact(facts[Math.floor(Math.random() * facts.length)]);
   }, []);
 
+  const [ref, inView] = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100 bg-opacity-50 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+CjxyZWN0IHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgZmlsbD0iI2ZmZiIvPgo8cGF0aCBkPSJNMzYgMTJIMjRhMiAyIDAgMCAwLTIgMnYyNGEyIDIgMCAwIDAgMiAyaDEyYTIgMiAwIDAgMCAyLTJWMTRhMiAyIDAgMCAwLTItMnoiIGZpbGw9IiNmMGYwZjAiLz4KPC9zdmc+')]">
-      <nav className="bg-white shadow-md">
+      <nav className="bg-white shadow-md fixed w-full z-50 transition-all duration-300" style={{ backgroundColor: scrollY > 50 ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 1)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -72,6 +78,21 @@ const Index = () => {
           transition={{ duration: 1 }}
           className="relative z-10 text-center"
         >
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{
+              duration: 5,
+              ease: "easeInOut",
+              times: [0, 0.5, 1],
+              repeat: Infinity,
+            }}
+            className="mb-8"
+          >
+            <Paw className="h-24 w-24 text-white mx-auto" />
+          </motion.div>
           <motion.h1 
             className="text-7xl font-bold text-white mb-4"
             initial={{ opacity: 0, y: -50 }}
@@ -115,8 +136,14 @@ const Index = () => {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Cat Fact of the Day</h2>
-          <p className="text-xl text-gray-600 italic">&ldquo;{catFact}&rdquo;</p>
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">Cat Fact of the Day</h2>
+          <motion.p 
+            className="text-2xl text-gray-600 italic"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            &ldquo;{catFact}&rdquo;
+          </motion.p>
         </motion.div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           <motion.div
@@ -165,26 +192,34 @@ const Index = () => {
         </div>
 
         <motion.div
+          ref={ref}
           initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">Cat Breed Showcase</h2>
-          <Carousel className="w-full max-w-4xl mx-auto">
+          <Carousel className="w-full max-w-5xl mx-auto">
             <CarouselContent>
               {["Siamese", "Persian", "Maine Coon", "Bengal", "Scottish Fold"].map((breed, index) => (
                 <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                  <div className="p-1">
-                    <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  <motion.div 
+                    className="p-1"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Card className="bg-white shadow-lg hover:shadow-xl transition-all duration-300">
                       <img src={`https://placekitten.com/300/200?image=${index + 1}`} alt={breed} className="w-full h-48 object-cover rounded-t-lg" />
                       <CardHeader>
                         <CardTitle className="text-center">{breed}</CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-center text-gray-600">Click to learn more about {breed} cats</p>
+                        <p className="text-center text-gray-600">Learn more about {breed} cats</p>
+                        <Button variant="outline" className="mt-4 w-full">
+                          Explore <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
                       </CardContent>
                     </Card>
-                  </div>
+                  </motion.div>
                 </CarouselItem>
               ))}
             </CarouselContent>
@@ -193,59 +228,89 @@ const Index = () => {
           </Carousel>
         </motion.div>
 
-        <Card className="mt-16 bg-white shadow-lg hover:shadow-xl transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center text-2xl"><Info className="mr-2 text-blue-500" /> Fascinating Cat Facts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Accordion type="single" collapsible className="w-full">
-              {[
-                { question: "How long do cats sleep?", answer: "Cats sleep an average of 15 hours a day, and some can sleep up to 20 hours in a 24-hour period." },
-                { question: "How fast can a cat run?", answer: "The average house cat can run at a top speed of about 30 mph over short distances." },
-                { question: "Do cats sweat?", answer: "Cats only sweat through their paw pads. They primarily cool themselves by panting." },
-                { question: "How many teeth do cats have?", answer: "Adult cats have 30 teeth, while kittens have 26 temporary teeth." },
-                { question: "Can cats see in complete darkness?", answer: "Cats can't see in complete darkness, but they can see in light six times dimmer than what humans need to see." }
-              ].map((item, index) => (
-                <AccordionItem value={`item-${index + 1}`} key={index}>
-                  <AccordionTrigger className="text-lg font-semibold">{item.question}</AccordionTrigger>
-                  <AccordionContent className="text-gray-700">
-                    {item.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.6 }}
+        >
+          <Card className="mt-16 bg-white shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center text-3xl"><Info className="mr-2 text-blue-500" /> Fascinating Cat Facts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Accordion type="single" collapsible className="w-full">
+                {[
+                  { question: "How long do cats sleep?", answer: "Cats sleep an average of 15 hours a day, and some can sleep up to 20 hours in a 24-hour period." },
+                  { question: "How fast can a cat run?", answer: "The average house cat can run at a top speed of about 30 mph over short distances." },
+                  { question: "Do cats sweat?", answer: "Cats only sweat through their paw pads. They primarily cool themselves by panting." },
+                  { question: "How many teeth do cats have?", answer: "Adult cats have 30 teeth, while kittens have 26 temporary teeth." },
+                  { question: "Can cats see in complete darkness?", answer: "Cats can't see in complete darkness, but they can see in light six times dimmer than what humans need to see." }
+                ].map((item, index) => (
+                  <AccordionItem value={`item-${index + 1}`} key={index}>
+                    <AccordionTrigger className="text-xl font-semibold">
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="flex items-center"
+                      >
+                        <Star className="mr-2 h-5 w-5 text-yellow-500" />
+                        {item.question}
+                      </motion.div>
+                    </AccordionTrigger>
+                    <AccordionContent className="text-gray-700 text-lg">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
-      <footer className="bg-gray-800 text-white py-12">
+      <footer className="bg-gradient-to-r from-purple-800 to-indigo-800 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h2 className="text-2xl font-bold mb-4">CatWorld</h2>
+              <h2 className="text-3xl font-bold mb-4 flex items-center">
+                <Paw className="mr-2" /> CatWorld
+              </h2>
               <p className="text-gray-300">Your source for all things feline</p>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
+              <h3 className="text-2xl font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Home</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Breeds</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Care</a></li>
-                <li><a href="#" className="text-gray-300 hover:text-white transition-colors">About</a></li>
+                {["Home", "Breeds", "Care", "About"].map((link, index) => (
+                  <motion.li key={index} whileHover={{ scale: 1.05 }}>
+                    <a href="#" className="text-gray-300 hover:text-white transition-colors">{link}</a>
+                  </motion.li>
+                ))}
               </ul>
             </div>
             <div>
-              <h3 className="text-xl font-semibold mb-4">Follow Us</h3>
+              <h3 className="text-2xl font-semibold mb-4">Follow Us</h3>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-300 hover:text-white transition-colors"><Facebook /></a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors"><Twitter /></a>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors"><Instagram /></a>
+                {[<Facebook />, <Twitter />, <Instagram />].map((icon, index) => (
+                  <motion.a
+                    key={index}
+                    href="#"
+                    className="text-gray-300 hover:text-white transition-colors"
+                    whileHover={{ scale: 1.2, rotate: 5 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {icon}
+                  </motion.a>
+                ))}
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center">
+          <motion.div 
+            className="mt-8 pt-8 border-t border-gray-700 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
             <p>&copy; 2023 CatWorld. All rights reserved.</p>
-          </div>
+          </motion.div>
         </div>
       </footer>
     </div>
